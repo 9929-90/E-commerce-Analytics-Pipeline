@@ -77,7 +77,7 @@ The orchestrator runs these stages in order and stops if a stage fails:
 
 ## Interactive web dashboard
 
-A responsive HTML/CSS/JavaScript dashboard is available in `web/`. It includes KPI cards, a revenue-composition chart, date filters, a product table with search/sorting, and local CSV import for the actual Gold outputs. The dashboard does not fabricate daily trends: the time-series chart appears after you load the real daily-sales export.
+A responsive HTML/CSS/JavaScript dashboard is available in `web/`. It includes KPI cards, a revenue-composition chart, date filters, a product table with search/sorting, automatic loading of published Gold CSVs, local CSV import, and JSON summary export. The dashboard does not fabricate daily trends: the time-series chart appears only when real daily-sales output is available. KPI baseline figures reflect the latest verified local run.
 
 ### Run locally
 
@@ -91,27 +91,13 @@ Open [http://localhost:8080](http://localhost:8080). You can also open `web/inde
 
 ### Export Gold Parquet to CSV
 
-After running the ETL pipeline, use this short PySpark script from the repository root to export browser-readable files:
+After running the ETL pipeline, export browser-readable files with the included script:
 
-```python
-from pathlib import Path
-from pyspark.sql import SparkSession
-
-root = Path.cwd()
-spark = SparkSession.builder.appName("ExportGoldForDashboard").master("local[*]").getOrCreate()
-try:
-    gold = root / "data" / "gold"
-    (spark.read.parquet(str(gold / "gold_daily_sales"))
-          .toPandas()
-          .to_csv(root / "web" / "daily_sales.csv", index=False))
-    (spark.read.parquet(str(gold / "gold_product_performance"))
-          .toPandas()
-          .to_csv(root / "web" / "product_performance.csv", index=False))
-finally:
-    spark.stop()
+```bash
+python scripts/export_gold_dashboard.py
 ```
 
-The CSVs are intentionally generated locally rather than committed automatically; review file sizes and data sensitivity before publishing any dataset. In the dashboard, choose each CSV under **Data & pipeline**. The files are read in your browser and are not uploaded by the page.
+The script writes `web/data/daily_sales.csv` and `web/data/product_performance.csv`. The dashboard automatically loads these files when they are published in that location; you can also import CSV files manually through **Data & pipeline**. Generated CSVs are ignored by Git by default. To publish real trends on GitHub Pages, review the generated aggregate files and dataset terms, then deliberately add them with `git add -f web/data/daily_sales.csv web/data/product_performance.csv` and commit them. The dashboard reads imported files in the browser; it does not upload them.
 
 ### Free static hosting with GitHub Pages
 
@@ -243,11 +229,11 @@ The delivered-order filter is applied consistently to both Gold datasets so that
 
 ## Scope and limitations
 
-This is a local batch pipeline intended to demonstrate data-engineering fundamentals. It does not currently include cloud deployment, scheduled orchestration, streaming ingestion, or production monitoring. A dashboard may exist in a separate local working copy; it is not described here as a repository deliverable unless its source and setup instructions are committed.
+This is a local batch pipeline intended to demonstrate data-engineering fundamentals. It does not currently include cloud deployment, scheduled orchestration, streaming ingestion, or production monitoring. The static dashboard is included in this repository. It consumes precomputed Gold exports and does not trigger the Spark pipeline from the browser.
 
 ## Next improvements
 
 - Add automated tests for transformation edge cases.
-- Add a reproducible dashboard folder and screenshots if the dashboard is part of the final deliverable.
+- Add automated browser tests and dashboard screenshots.
 - Add CI to run linting and validation tests on pushes.
 - Add configurable input/output paths and structured logging.
