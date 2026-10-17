@@ -37,3 +37,6 @@ data/raw/
 
 # Local dashboard exports (generated from Gold Parquet)
 web/*.csv
+
+# Derived dashboard exports are local by default; publish only after review
+web/data/*.csv
