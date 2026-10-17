@@ -15,33 +15,21 @@ The project ingests raw source data, transforms it through Bronze, Silver, and G
 
 ## Architecture
 
-```text
-Olist CSV Source Data
-        |
-        v
-Bronze Layer
-Python / Pandas / Parquet
-Source metadata and row-count verification
-        |
-        v
-Silver Layer
-PySpark transformations
-Data cleaning and validation
-        |
-        v
-Gold Layer
-+--------------------------+
-| Daily Sales              |
-| Product Performance      |
-+--------------------------+
-        |
-        v
-Data Quality Validation
-        |
-        v
-SQL Analytics
-Revenue rankings, category analysis,
-daily sales trends, product coverage
+```mermaid
+flowchart TD
+    A["Olist CSV Source Data"] --> B["Bronze Layer"]
+    B --> C["Silver Layer"]
+    C --> D{"Silver Data Quality Checks"}
+    D -->|Pass| E["Gold Daily Sales"]
+    D -->|Pass| F["Gold Product Performance"]
+    E --> G{"Gold Data Quality Checks"}
+    F --> G
+    G -->|Pass| H["DuckDB SQL Analytics"]
+    H --> I["Sales Trends and Order Metrics"]
+    H --> J["Product and Category Performance"]
+```
+
+The pipeline follows a Bronze → Silver → Gold architecture. Raw CSV files are ingested into Parquet, transformed with PySpark, validated, and queried using DuckDB SQL.
 
 
 ## Technology Stack
