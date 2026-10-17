@@ -75,6 +75,53 @@ The orchestrator runs these stages in order and stops if a stage fails:
 7. Validate product performance and revenue reconciliation.
 8. Execute the analytical SQL queries in `sql/gold_analytics.sql`.
 
+## Interactive web dashboard
+
+A responsive HTML/CSS/JavaScript dashboard is available in `web/`. It includes KPI cards, a revenue-composition chart, date filters, a product table with search/sorting, and local CSV import for the actual Gold outputs. The dashboard does not fabricate daily trends: the time-series chart appears after you load the real daily-sales export.
+
+### Run locally
+
+From the repository root, start a static web server (Python is sufficient):
+
+```bash
+python -m http.server 8080 --directory web
+```
+
+Open [http://localhost:8080](http://localhost:8080). You can also open `web/index.html` directly, but a local server is recommended.
+
+### Export Gold Parquet to CSV
+
+After running the ETL pipeline, use this short PySpark script from the repository root to export browser-readable files:
+
+```python
+from pathlib import Path
+from pyspark.sql import SparkSession
+
+root = Path.cwd()
+spark = SparkSession.builder.appName("ExportGoldForDashboard").master("local[*]").getOrCreate()
+try:
+    gold = root / "data" / "gold"
+    (spark.read.parquet(str(gold / "gold_daily_sales"))
+          .toPandas()
+          .to_csv(root / "web" / "daily_sales.csv", index=False))
+    (spark.read.parquet(str(gold / "gold_product_performance"))
+          .toPandas()
+          .to_csv(root / "web" / "product_performance.csv", index=False))
+finally:
+    spark.stop()
+```
+
+The CSVs are intentionally generated locally rather than committed automatically; review file sizes and data sensitivity before publishing any dataset. In the dashboard, choose each CSV under **Data & pipeline**. The files are read in your browser and are not uploaded by the page.
+
+### Free static hosting with GitHub Pages
+
+1. Push the `web/` folder to the `main` branch.
+2. In GitHub, open **Settings → Pages** and set the publishing source to **GitHub Actions**.
+3. The workflow in `.github/workflows/deploy-dashboard.yml` deploys the `web/` folder.
+4. After the workflow succeeds, the public URL will be `https://9929-90.github.io/E-commerce-Analytics-Pipeline/`.
+
+The hosted UI can show the verified project-level KPI baseline. Daily trends and product details require loading the generated Gold CSV exports. Do not commit large or sensitive raw datasets.
+
 ## Repository structure
 
 ```text
