@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Olist | Commerce Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Olist Analytics home"><span class="brand-mark">o</span><span>olist<span class="brand-muted">/insights</span></span></a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav>
+        <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span> Overview</a>
+        <a class="nav-link" href="#sales"><span class="nav-icon">↗</span> Sales analytics</a>
+        <a class="nav-link" href="#products"><span class="nav-icon">▦</span> Product performance</a>
+        <a class="nav-link" href="#data"><span class="nav-icon">⇧</span> Data & pipeline</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="pipeline-card"><span class="status-dot"></span><div><strong>Batch pipeline</strong><small>Gold layer · Olist</small></div><span class="live-tag">LOCAL</span></div>
+        <div class="sidebar-foot">DATA ENGINEERING PROJECT<br>PySpark · Parquet · Analytics</div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+      <header class="topbar">
+        <div class="breadcrumb">Workspace <span>/</span> <strong>Overview</strong></div>
+        <div class="top-actions"><span class="data-badge"><span class="status-dot"></span> Gold layer</span><button class="button button-quiet" id="resetBtn">Reset view</button></div>
+      </header>
+
+      <section class="page-heading">
+        <div><div class="eyebrow">COMMERCE INTELLIGENCE / BRASIL</div><h1>Sales overview<span>.</span></h1><p class="subtitle">A clear view of order performance, revenue, and product activity.</p></div>
+        <div class="heading-meta"><span class="meta-label">DATA SOURCE</span><strong>Brazilian E-Commerce · Olist</strong><small>Delivered orders · BRL currency</small></div>
+      </section>
+
+      <section class="filter-row" aria-label="Dashboard filters">
+        <label class="filter-control"><span>DATE RANGE</span><select id="dateFilter"><option value="all">All available dates</option></select></label>
+        <label class="filter-control"><span>PRODUCT CATEGORY</span><select id="categoryFilter"><option value="all">All categories</option></select></label>
+        <div class="filter-note"><span class="filter-dot"></span><span id="filterStatus">Showing verified project-level totals</span></div>
+      </section>
+
+      <section class="kpi-grid" aria-label="Key performance indicators">
+        <article class="kpi-card"><div class="kpi-top"><span>Total revenue</span><span class="kpi-icon violet">↗</span></div><div class="kpi-value" id="totalRevenue">R$ 15.42M</div><div class="kpi-foot"><span class="mini-indicator">●</span> Product revenue + freight</div></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Delivered orders</span><span class="kpi-icon blue">▤</span></div><div class="kpi-value" id="deliveredOrders">96,478</div><div class="kpi-foot">Completed order records</div></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Average order value</span><span class="kpi-icon amber">◈</span></div><div class="kpi-value" id="averageOrder">R$ 159.83</div><div class="kpi-foot">Revenue per delivered order</div></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Freight revenue</span><span class="kpi-icon green">⇢</span></div><div class="kpi-value" id="freightRevenue">R$ 2.20M</div><div class="kpi-foot">Shipping charges in delivered orders</div></article>
+      </section>
+
+      <section class="charts-grid" id="sales">
+        <article class="panel sales-panel">
+          <div class="panel-heading"><div><div class="section-kicker">PERFORMANCE</div><h2>Revenue over time</h2><p>Daily revenue from your Gold daily-sales dataset.</p></div><span class="chart-chip">BRL <span>↘</span></span></div>
+          <div class="chart-area" id="salesChartWrap"><canvas id="salesChart" aria-label="Daily revenue chart"></canvas><div class="empty-chart" id="salesEmpty"><div class="empty-icon">⌁</div><strong>Connect your daily Gold output</strong><p>Upload the daily sales CSV below to display the actual revenue trend. No synthetic data is shown.</p><a href="#data">Load analytics data ↓</a></div></div>
+        </article>
+        <article class="panel mix-panel">
+          <div class="panel-heading"><div><div class="section-kicker">REVENUE MIX</div><h2>Revenue composition</h2><p>Verified totals from the pipeline run.</p></div></div>
+          <div class="donut-wrap"><canvas id="mixChart" aria-label="Product and freight revenue composition"></canvas><div class="donut-center"><span>Total revenue</span><strong>R$15.42M</strong></div></div>
+          <div class="legend-list"><div class="legend-row"><span class="legend-key product-key"></span><span>Product revenue</span><strong>R$ 13.22M</strong><small>85.7%</small></div><div class="legend-row"><span class="legend-key freight-key"></span><span>Freight revenue</span><strong>R$ 2.20M</strong><small>14.3%</small></div></div>
+        </article>
+      </section>
+
+      <section class="panel product-panel" id="products">
+        <div class="panel-heading"><div><div class="section-kicker">CATALOG</div><h2>Product performance</h2><p>Rank products by revenue or units using the generated Gold output.</p></div><div class="table-actions"><input id="productSearch" type="search" placeholder="Search products…" aria-label="Search products"><select id="sortProducts" aria-label="Sort products"><option value="revenue">Sort: Revenue</option><option value="units">Sort: Units sold</option><option value="orders">Sort: Orders</option></select></div></div>
+        <div class="table-wrap"><table><thead><tr><th>PRODUCT</th><th>REVENUE</th><th>UNITS SOLD</th><th>ORDERS</th><th>REVENUE SHARE</th></tr></thead><tbody id="productRows"><tr><td colspan="5" class="empty-table"><span class="empty-icon">▦</span><strong>Product-level details are ready to connect</strong><p>Upload the product performance CSV to populate this table with real product metrics.</p></td></tr></tbody></table></div>
+        <div class="table-footer"><span id="productCount">32,951 products in Gold output</span><span>Values are based on delivered orders</span></div>
+      </section>
+
+      <section class="panel data-panel" id="data">
+        <div class="panel-heading"><div><div class="section-kicker">DATA & PIPELINE</div><h2>Connect Gold layer outputs</h2><p>Load the actual files produced by your PySpark pipeline. Files are processed in your browser and are not uploaded to a server.</p></div><span class="secure-tag">↗ Browser-only</span></div>
+        <div class="upload-grid">
+          <label class="upload-card" for="dailyFile"><span class="upload-icon">↥</span><span class="upload-title">Daily sales output</span><span class="upload-description">CSV exported from <code>gold_daily_sales</code></span><span class="upload-button">Choose CSV file</span><span class="file-name" id="dailyFileName">No file selected</span><input id="dailyFile" type="file" accept=".csv,text/csv"></label>
+          <label class="upload-card" for="productFile"><span class="upload-icon">▤</span><span class="upload-title">Product performance output</span><span class="upload-description">CSV exported from <code>gold_product_performance</code></span><span class="upload-button">Choose CSV file</span><span class="file-name" id="productFileName">No file selected</span><input id="productFile" type="file" accept=".csv,text/csv"></label>
+        </div>
+        <div class="pipeline-note"><span class="note-icon">i</span><div><strong>How this dashboard works</strong><p>PySpark does the heavy data processing. This frontend reads the resulting Gold analytics, renders charts, and supports searching and filtering. It does not rerun Spark or change your source data.</p></div></div>
+        <div class="data-footer"><span id="dataStatus"><span class="status-dot muted"></span> Waiting for Gold CSV exports</span><button class="button button-primary" id="exportSummary">Export dashboard summary</button></div>
+      </section>
+      <footer class="footer"><span>OLIST / INSIGHTS</span><span>Built with HTML · CSS · JavaScript · Chart.js</span><span>Portfolio project · Not affiliated with Olist</span></footer>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
