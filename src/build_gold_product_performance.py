@@ -18,21 +18,39 @@ spark = (
 
 spark.sparkContext.setLogLevel("WARN")
 
-
 try:
     print("Loading Silver tables...")
 
+    orders = spark.read.parquet(str(SILVER / "orders"))
     items = spark.read.parquet(str(SILVER / "order_items"))
     products = spark.read.parquet(str(SILVER / "products"))
 
+    print("Order rows:", orders.count())
     print("Order item rows:", items.count())
     print("Product rows:", products.count())
 
-    print("Joining products with order items...")
+    # Use the same delivered-order scope as the Gold daily-sales table.
+    delivered_order_ids = (
+        orders
+        .filter(F.col("order_status") == "delivered")
+        .select("order_id")
+        .distinct()
+    )
 
-    joined = products.join(items, on="product_id", how="left")
+    delivered_items = items.join(
+        delivered_order_ids,
+        on="order_id",
+        how="inner",
+    )
 
-    print("Aggregating product metrics...")
+    print("Joining products with delivered order items...")
+
+    # Keep every catalog product, including products with no delivered sales.
+    joined = products.join(
+        delivered_items,
+        on="product_id",
+        how="left",
+    )
 
     gold = (
         joined
@@ -49,8 +67,13 @@ try:
         )
         .withColumn(
             "total_revenue",
-            F.col("product_revenue") + F.col("freight_revenue"),
+            F.round(
+                F.col("product_revenue") + F.col("freight_revenue"),
+                2,
+            ),
         )
+        .withColumn("product_revenue", F.round("product_revenue", 2))
+        .withColumn("freight_revenue", F.round("freight_revenue", 2))
     )
 
     GOLD.mkdir(parents=True, exist_ok=True)
