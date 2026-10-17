@@ -38,9 +38,9 @@
   function normalizeDaily(rows) {
     return rows.map(r => {
       const dateKey = key(r, ['orderdate','date','day','salesdate','createddate']);
-      const revenueKey = key(r, ['totalrevenue','revenue','total_sales','salesrevenue','grossrevenue']);
-      const productKey = key(r, ['productrevenue','product_sales','itemrevenue']);
-      const freightKey = key(r, ['freightrevenue','freightvalue','shippingrevenue']);
+      const revenueKey = key(r, ['totalrevenue','revenue','total_sales','salesrevenue','grossrevenue','totalsales']);
+      const productKey = key(r, ['productrevenue','product_sales','itemrevenue','total_product_sales']);
+      const freightKey = key(r, ['freightrevenue','freightvalue','shippingrevenue','total_freight']);
       const ordersKey = key(r, ['totalorders','deliveredorders','ordercount','orders','orderscount']);
       const date = dateKey ? r[dateKey] : '';
       const productRevenue = productKey ? number(r[productKey]) : 0;
