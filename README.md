@@ -1,5 +1,31 @@
 # Olist E-commerce Analytics Pipeline
 
+**An end-to-end data engineering project transforming raw e-commerce data into validated analytics-ready datasets.**
+
+[**View Live Dashboard →**](https://9929-90.github.io/E-commerce-Analytics-Pipeline/)
+
+Built with Python, PySpark, Parquet, DuckDB SQL, and a responsive web dashboard.
+
+### Project Highlights
+
+- **Batch ETL:** Raw CSV ingestion, Bronze/Silver/Gold transformations, and orchestration.
+- **Data Quality:** Schema checks, product coverage validation, and revenue reconciliation.
+- **Analytics:** Daily sales, product performance, category rankings, and day-over-day comparisons.
+- **Visualization:** Interactive dashboard with KPI cards, sales trends, and searchable product data.
+- **Deployment:** Static dashboard hosted on GitHub Pages.
+
+### Dashboard Preview
+
+![E-commerce analytics dashboard overview](docs/screenshots/dashboard-overview.png)
+
+[Open the live interactive dashboard](https://9929-90.github.io/E-commerce-Analytics-Pipeline/)
+
+---
+
+
+
+# Olist E-commerce Analytics Pipeline
+
 An end-to-end, locally runnable data engineering project built with **Python, PySpark, Parquet, DuckDB SQL, and data-quality checks**. It transforms Brazilian Olist e-commerce data into analytics-ready Gold datasets for sales and product performance.
 
 > **Project type:** Batch ETL portfolio project  
