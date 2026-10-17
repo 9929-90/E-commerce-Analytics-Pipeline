@@ -152,5 +152,34 @@
     const blob = new Blob([JSON.stringify(summary, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='olist-dashboard-summary.json'; a.click(); URL.revokeObjectURL(url);
   });
+  async function loadBundledData() {
+    try {
+      const [dailyResponse, productResponse] = await Promise.all([
+        fetch('data/daily_sales.csv'),
+        fetch('data/product_performance.csv')
+      ]);
+      if (!dailyResponse.ok || !productResponse.ok) return;
+      const [dailyText, productText] = await Promise.all([dailyResponse.text(), productResponse.text()]);
+      const daily = normalizeDaily(parseCSV(dailyText));
+      const products = normalizeProducts(parseCSV(productText));
+      if (daily.length) {
+        state.daily = daily;
+        $('dailyFileName').textContent = 'data/daily_sales.csv · ' + int(daily.length) + ' rows';
+      }
+      if (products.length) {
+        state.products = products;
+        $('productFileName').textContent = 'data/product_performance.csv · ' + int(products.length) + ' rows';
+      }
+      refreshFilters();
+      updateKpis();
+      renderDaily();
+      renderProducts();
+      setStatus('Loaded published Gold data · ' + int(state.daily.length) + ' daily rows, ' + int(state.products.length) + ' products', true);
+    } catch (error) {
+      console.warn('Bundled Gold CSVs could not be loaded:', error);
+    }
+  }
+
   renderMix();
+  loadBundledData();
 })();
